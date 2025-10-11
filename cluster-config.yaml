@@ -1,0 +1,27 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: visitor-counter-cluster
+  region: us-east-1
+  version: "1.28"
+
+iam:
+  withOIDC: true
+
+addons:
+- name: vpc-cni
+- name: coredns
+- name: kube-proxy
+
+nodeGroups:
+  - name: ng-1
+    instanceType: t3.small
+    desiredCapacity: 2
+    minSize: 1
+    maxSize: 3
+    volumeSize: 20
+    iam:
+      withAddonPolicies:
+        albIngress: true
+        cloudWatch: true

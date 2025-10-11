@@ -1,0 +1,8 @@
+apiVersion: v2
+name: visitor-counter
+description: A Helm chart for Kubernetes to deploy Visitor Counter App
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+
+dependencies: []
