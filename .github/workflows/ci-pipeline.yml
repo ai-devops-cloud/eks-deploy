@@ -5,19 +5,21 @@ on:
     branches: [ main ]
 
 env:
-  AWS_REGION: us-east-1
-  EKS_CLUSTER: visitor-counter-cluster
-  DOCKERHUB_REPOSITORY: pandes3/visitor-counter
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  DOCKERHUB_REPOSITORY: ${{ secrets.DOCKERHUB_USERNAME }}/visitor-counter
   IMAGE_TAG: ${{ github.sha }}
 
 jobs:
   build-and-push:
-    name: Build and Push to Docker Hub
+    name: Build and Push
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout code
+    - name: Checkout code with PAT
       uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.CI_PAT }}
+        fetch-depth: 0
 
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -30,29 +32,39 @@ jobs:
     - name: Run tests
       run: npm test
 
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
     - name: Log in to Docker Hub
       uses: docker/login-action@v3
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Build Docker image
-      run: |
-        docker build -t ${{ env.DOCKERHUB_REPOSITORY }}:${{ env.IMAGE_TAG }} .
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: |
+          ${{ env.DOCKERHUB_REPOSITORY }}:latest
+          ${{ env.DOCKERHUB_REPOSITORY }}:${{ env.IMAGE_TAG }}
 
-    - name: Push Docker image
+    - name: Update Helm chart with new image tag
       run: |
-        docker push ${{ env.DOCKERHUB_REPOSITORY }}:${{ env.IMAGE_TAG }}
-
-    - name: Update Helm values
-      run: |
+        # Update values.yaml
         sed -i 's|tag:.*|tag: \"${{ env.IMAGE_TAG }}\"|g' charts/visitor-counter/values.yaml
-        echo "Updated image tag to: ${{ env.IMAGE_TAG }}"
+        
+        # Verify the change
+        echo "Updated charts/visitor-counter/values.yaml:"
+        grep "tag:" charts/visitor-counter/values.yaml
 
-    - name: Commit changes
+    - name: Commit and push Helm chart updates
       run: |
-        git config --local user.email "pande.santosh@gmail.com"
-        git config --local user.name "Santosh Pande"
-        git add charts/visitor-counter/values.yaml
-        git commit -m "Update image to ${{ env.IMAGE_TAG }}" || echo "No changes to commit"
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add .
+        git commit -m "ci: update image tag to ${{ env.IMAGE_TAG }}" || exit 0
         git push
+      env:
+        GITHUB_TOKEN: ${{ secrets.CI_PAT }}
