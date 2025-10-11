@@ -3,7 +3,7 @@ replicaCount: 2
 
 image:
   repository: your-dockerhub-username/visitor-counter
-  tag: "f4a6c30ed8a7c31fc8f5cffb25354cd5d31f4a69"
+  tag: "f8b7a1be4b354cd6ce9ab8ace30d5c753140e6c1"
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
