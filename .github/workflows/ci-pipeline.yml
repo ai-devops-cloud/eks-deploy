@@ -9,7 +9,7 @@ on:
 env:
   AWS_REGION: us-east-1
   EKS_CLUSTER: visitor-counter-cluster
-  DOCKERHUB_REPOSITORY: your-dockerhub-username/visitor-counter
+  DOCKERHUB_REPOSITORY: pandes3/visitor-counter
   HELM_CHART_PATH: ./charts/visitor-counter
   IMAGE_TAG: ${{ github.sha }}
 
