@@ -2,7 +2,7 @@
 replicaCount: 2
 
 image:
-  repository: your-dockerhub-username/visitor-counter
+  repository: pandes3/visitor-counter
   tag: "89fff689eb7e44102630f82b6ba607ebc194cd4f"
   pullPolicy: IfNotPresent
 
