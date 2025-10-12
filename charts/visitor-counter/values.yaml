@@ -3,7 +3,7 @@ replicaCount: 2
 
 image:
   repository: your-dockerhub-username/visitor-counter
-  tag: "latest"  # Will be updated by CI pipeline
+  tag: "0050ddf6f88e4fb6cbb5dcd3f35fa12bf5c16fac"
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
