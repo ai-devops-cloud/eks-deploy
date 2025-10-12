@@ -9,7 +9,7 @@ spec:
   project: default
   
   source:
-    repoURL: https://github.com/your-username/eks-deploy.git
+    repoURL: https://github.com/ai-devops-cloud/eks-deploy.git
     targetRevision: main
     path: charts/visitor-counter
     helm:
